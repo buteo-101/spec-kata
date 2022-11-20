@@ -10,9 +10,8 @@ namespace SpecConsole.Services
     public class SpeciesCalculator
     {
 
-        
-
-        public int[] GetInnerClocksForGeneration(int[] firstGenClocks, int iterations)
+       
+        public List<int> GetInnerClocksForGeneration(List<int> firstGenClocks, int iterations)
         {
             int gen = 0;
             var clocks = firstGenClocks;
@@ -24,7 +23,7 @@ namespace SpecConsole.Services
             return clocks;
         }
 
-        public int[] GetInnerClocksForGenerationWithMutations(int[] firstGenClocks, int iterations)
+        public List<int> GetInnerClocksForGenerationWithMutations(List<int> firstGenClocks, int iterations)
         {
             int gen = 0;
             var clocks = firstGenClocks;
@@ -36,24 +35,24 @@ namespace SpecConsole.Services
             return clocks;
         }
 
-        public int[] GetNextGenClocks(int[] clocks)
+        public List<int> GetNextGenClocks(List<int> clocks)
         {
             var newBorns = clocks.Count(c => c == 0);
             var nextClocks = clocks.Select(c => GetNextClock(c)).ToList();
             nextClocks.AddRange(Enumerable.Repeat(8, newBorns));
-            return nextClocks.ToArray();
+            return nextClocks.ToList();
 
         }
-        public void GetNextGenClocksMutateArrays(ref int[] clocks)
+        public void GetNextGenClocksMutateArrays(ref List<int> clocks)
         {
             var newBorns = clocks.Count(c => c == 0);
-            for(int i = 0; i < clocks.Length; i++)
+            for(int i = 0; i < clocks.Count; i++)
             {
                 clocks[i] =  GetNextClock(clocks[i]);
             }
             for(int i = 0; i < newBorns; i++)
             {
-                clocks.Append(8);
+                clocks.Add(8);
             }
         
         }
