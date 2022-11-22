@@ -29,7 +29,7 @@ namespace SpecConsole.Services
             var clocks = firstGenClocks;
             while (gen < iterations)
             {
-                GetNextGenClocksMutateArrays(ref clocks);
+                GetNextGenClocksMutateArrays2(ref clocks);
                 gen++;
             }
             return clocks;
@@ -55,6 +55,23 @@ namespace SpecConsole.Services
                 clocks.Add(8);
             }
         
+        }
+
+        public void GetNextGenClocksMutateArrays2(ref List<int> clocks)
+        {
+            var newBorns = clocks.Count(c => c == 0);
+            for (int i = 0; i < clocks.Count + newBorns; i++)
+            {
+                if (i < clocks.Count)
+                {
+                clocks[i] = GetNextClock(clocks[i]);
+
+                }
+      
+            }
+
+            clocks.AddRange(Enumerable.Repeat(8, newBorns));
+
         }
 
         public int GetNextClock(int clock)
