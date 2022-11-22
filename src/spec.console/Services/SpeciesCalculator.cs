@@ -6,14 +6,14 @@ using System.Text;
 
 namespace SpecConsole.Services
 {
-  
+
     public class SpeciesCalculator
     {
-
-       
-        public List<int> GetInnerClocksForGeneration(List<int> firstGenClocks, int iterations)
+        const short newBornValue = 8;
+      
+        public List<short> GetInnerClocksForGeneration(List<short> firstGenClocks, int iterations)
         {
-            int gen = 0;
+            short gen = 0;
             var clocks = firstGenClocks;
             while (gen < iterations)
             {
@@ -23,64 +23,91 @@ namespace SpecConsole.Services
             return clocks;
         }
 
-        public List<int> GetInnerClocksForGenerationWithMutations(List<int> firstGenClocks, int iterations)
+        public List<short> GetInnerClocksForGenerationWithMutations(List<short> firstGenClocks, int iterations)
         {
-            int gen = 0;
+            short gen = 0;
             var clocks = firstGenClocks;
             while (gen < iterations)
             {
-                GetNextGenClocksMutateArrays2(ref clocks);
+                GetNextGenClocksMutateArrays(ref clocks);
                 gen++;
             }
             return clocks;
         }
 
-        public List<int> GetNextGenClocks(List<int> clocks)
+        public List<short> GetInnerClocksForGenerationWithMutationsBySeed(List<short> firstGenClocks, int iterations)
+        {         
+            var clocks = new List<short>();
+
+            foreach (var seed in firstGenClocks)
+            {
+                // get all spec generated in x generations by the first seed
+                var clocksFromSeed = new List<short> { seed };
+                short gen = 0;
+                while (gen < iterations)
+                {
+                    //clocksFromSeed = GetNextGenClocks(clocksFromSeed);
+                   GetNextGenClocksMutateArrays(ref clocksFromSeed);
+                   gen++;
+                }
+                clocks.AddRange(clocksFromSeed);             
+
+            }
+            return clocks;
+        }
+
+        public List<short> GetInnerClocksForGenerationWithMutationsBySeedSlice(List<short> firstGenClocks, int iterations, int slice = 3)
+        {
+        
+            var clocks = new List<short>();           
+
+            for (int i = 0; i * slice < firstGenClocks.Count; i++)
+            {
+                // get all spec generated in x generations by the first seed
+                var clocksFromSeed = firstGenClocks.Skip(i * slice).Take(slice).ToList();
+                short gen = 0;
+                while (gen < iterations)
+                {
+                    GetNextGenClocksMutateArrays(ref clocksFromSeed);
+                    gen++;
+                }
+                clocks.AddRange(clocksFromSeed);
+            }
+            return clocks;
+        }
+
+        public List<short> GetNextGenClocks(List<short> clocks)
         {
             var newBorns = clocks.Count(c => c == 0);
             var nextClocks = clocks.Select(c => GetNextClock(c)).ToList();
-            nextClocks.AddRange(Enumerable.Repeat(8, newBorns));
+            nextClocks.AddRange(Enumerable.Repeat(newBornValue, newBorns));
             return nextClocks.ToList();
-
-        }
-        public void GetNextGenClocksMutateArrays(ref List<int> clocks)
-        {
-            var newBorns = clocks.Count(c => c == 0);
-            for(int i = 0; i < clocks.Count; i++)
-            {
-                clocks[i] =  GetNextClock(clocks[i]);
-            }
-            for(int i = 0; i < newBorns; i++)
-            {
-                clocks.Add(8);
-            }
-        
         }
 
-        public void GetNextGenClocksMutateArrays2(ref List<int> clocks)
+
+        public void GetNextGenClocksMutateArrays(ref List<short> clocks)
         {
             var newBorns = clocks.Count(c => c == 0);
-            for (int i = 0; i < clocks.Count + newBorns; i++)
+            for (int i = 0; i < clocks.Count; i++)
             {
-                if (i < clocks.Count)
-                {
                 clocks[i] = GetNextClock(clocks[i]);
-
-                }
-      
             }
 
-            clocks.AddRange(Enumerable.Repeat(8, newBorns));
-
+            clocks.AddRange(Enumerable.Repeat(newBornValue, newBorns));
         }
 
-        public int GetNextClock(int clock)
+
+
+        public short GetNextClock(short  clock)
         {
+            const short defaultNextValue = 6;
+            const short step = 1;
+         
             if (clock > 0)
             {
-                return clock - 1;
+                return (short)(clock - step);
             }
-            return 6;
+            return defaultNextValue;
         }
     }
 }
